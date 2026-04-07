@@ -83,10 +83,16 @@ async function processImage() {
   // Накладываем текстуру
   const pattern = ctx.createPattern(texture, "repeat");
 
-  ctx.globalAlpha = 0.5;
-  ctx.globalCompositeOperation = "multiply";
-  ctx.fillStyle = pattern;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+// Сначала текстура
+ctx.globalAlpha = 0.7;
+ctx.globalCompositeOperation = "overlay";
+ctx.fillStyle = pattern;
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Потом затемнение (чтобы сохранить форму)
+ctx.globalAlpha = 0.4;
+ctx.globalCompositeOperation = "multiply";
+ctx.drawImage(car, 0, 0);
 }
 
 </script>
