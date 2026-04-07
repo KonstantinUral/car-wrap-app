@@ -78,7 +78,9 @@ async function processImage() {
   canvas.height = car.height;
 
   // Рисуем машину
-  ctx.drawImage(car, 0, 0);
+ctx.filter = "contrast(1.2) brightness(0.9)";
+ctx.drawImage(car, 0, 0);
+ctx.filter = "none";
 
   // Накладываем текстуру
   const pattern = ctx.createPattern(texture, "repeat");
