@@ -1,12 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Car Wrap Preview</title>
+<title>Примерка пленки</title>
+
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #111;
+  color: white;
+}
+h1 {
+  margin-top: 20px;
+}
+canvas {
+  margin-top: 20px;
+  max-width: 90%;
+}
+button {
+  margin: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+select {
+  padding: 10px;
+  margin-top: 10px;
+}
+</style>
+
 </head>
 <body>
 
-<h1>Работает 🚗</h1>
+<h1>Примерка пленки на авто</h1>
+
+<input type="file" id="upload">
+
+<br>
+
+<select id="textureSelect">
+  <option value="https://i.imgur.com/8IhQK6G.jpg">Matte Black</option>
+  <option value="https://i.imgur.com/3dXnK3L.jpg">Gloss Red</option>
+</select>
+
+<br>
+
+<button onclick="processImage()">Применить</button>
+
+<br>
+
+<canvas id="canvas"></canvas>
+
+<script>
+
+function loadImage(src) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.src = src;
+  });
+}
+
+async function processImage() {
+  const file = document.getElementById("upload").files[0];
+  if (!file) return alert("Загрузи фото");
+
+  const textureSrc = document.getElementById("textureSelect").value;
+
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  const car = await loadImage(URL.createObjectURL(file));
+  const texture = await loadImage(textureSrc);
+
+  canvas.width = car.width;
+  canvas.height = car.height;
+
+  // Рисуем машину
+  ctx.drawImage(car, 0, 0);
+
+  // Накладываем текстуру
+  const pattern = ctx.createPattern(texture, "repeat");
+
+  ctx.globalAlpha = 0.5;
+  ctx.globalCompositeOperation = "multiply";
+  ctx.fillStyle = pattern;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+</script>
 
 </body>
 </html>
