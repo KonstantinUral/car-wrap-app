@@ -45,7 +45,8 @@ select {
 
 <br>
 
-<button onclick="processImage()">Применить</button>
+<button onclick="processImage()">Просто наложение</button>
+<button onclick="generateAI()">AI генерация</button>
 
 <br>
 
@@ -53,46 +54,52 @@ select {
 
 <script>
 
-function loadImage(src) {
-  return new Promise(resolve => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => resolve(img);
-    img.src = src;
+const API_KEY = "SG_730c182311d3b307";
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = error => reject(error);
   });
 }
 
-async function processImage() {
+async function generateAI() {
   const file = document.getElementById("upload").files[0];
   if (!file) return alert("Загрузи фото");
 
-  const textureSrc = document.getElementById("textureSelect").value;
+  const base64 = await toBase64(file);
+
+  const prompt = "A realistic photo of the same car. Change only the body color to matte raven black vinyl wrap. Keep reflections, lighting, wheels, windows and background unchanged.";
+
+  const response = await fetch("https://api.segmind.com/v1/sdxl-img2img", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      image: base64,
+      prompt: prompt,
+      strength: 0.6,
+      guidance_scale: 7.5
+    })
+  });
+
+  const data = await response.json();
+
+  const img = new Image();
+  img.src = "data:image/png;base64," + data.image;
 
   const canvas = document.getElementById("canvas");
   const ctx = canvas.getContext("2d");
 
-  const car = await loadImage(URL.createObjectURL(file));
-  const texture = await loadImage(textureSrc);
-
-  canvas.width = car.width;
-  canvas.height = car.height;
-
-  // Рисуем машину
-ctx.filter = "contrast(1.2) brightness(0.9)";
-ctx.drawImage(car, 0, 0);
-ctx.filter = "none";
-
-// Рисуем текстуру НА ВСЮ МАШИНУ (без повторений)
-ctx.globalAlpha = 0.7;
-ctx.globalCompositeOperation = "overlay";
-ctx.drawImage(texture, 0, 0, canvas.width, canvas.height);
-ctx.globalAlpha = 0.3;
-ctx.globalCompositeOperation = "multiply";
-ctx.drawImage(car, 0, 0);
-// Потом затемнение (чтобы сохранить форму)
-ctx.globalAlpha = 0.4;
-ctx.globalCompositeOperation = "multiply";
-ctx.drawImage(car, 0, 0);
+  img.onload = () => {
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+  };
 }
 
 </script>
