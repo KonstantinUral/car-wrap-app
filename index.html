@@ -54,8 +54,6 @@ select {
 
 <script>
 
-const API_KEY = "SG_730c182311d3b307";
-
 function toBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -87,6 +85,7 @@ async function generateAI() {
   const data = await response.json();
 
   if (!data.image) {
+    console.log(data);
     alert("Ошибка генерации");
     return;
   }
@@ -104,51 +103,6 @@ async function generateAI() {
     ctx.drawImage(img, 0, 0);
   };
 }
-
-    result = await check.json();
-    console.log("STEP 2:", result);
-
-    if (result.status === "succeeded") break;
-    if (result.status === "failed") {
-      alert("Ошибка генерации");
-      return;
-    }
-
-    await new Promise(r => setTimeout(r, 2000));
-  }
-
-  const imageUrl = result.output[0];
-
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  img.src = imageUrl;
-
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
-
-  img.onload = () => {
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0);
-  };
-}
-
-  const data = await response.json();
-  console.log(data);
-
-  const img = new Image();
-  img.src = "data:image/png;base64," + data.image;
-
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
-
-  img.onload = () => {
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0);
-  };
-}
-
 </script>
 
 </body>
