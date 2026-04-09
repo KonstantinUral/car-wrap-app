@@ -80,7 +80,12 @@ async function generateAI() {
   if (!file) return alert("Загрузи фото");
 
   const base64 = await toBase64(file);
-  const imageUrl = await uploadToImgBB(base64);
+  let imageUrl = await uploadToImgBB(base64);
+
+// 🔥 заменяем avif на jpg
+imageUrl = imageUrl.replace(".avif", ".jpg");
+
+console.log("IMAGE URL FIXED:", imageUrl);
   console.log("IMAGE URL:", imageUrl);
   console.log(imageUrl);
   const prompt = "Realistic photo of the same car. Change only the body color to matte black vinyl wrap. Keep everything else identical.";
